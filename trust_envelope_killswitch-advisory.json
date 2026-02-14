@@ -1,0 +1,80 @@
+{
+  "envelope_id": "te-d16eec51d05d",
+  "schema_version": "1.0",
+  "generated_at": "2026-02-14T21:05:01.766101+00:00",
+  "valid_until": "2026-02-14T22:05:01.766101+00:00",
+  "ttl_seconds": 3600,
+  "subject": {
+    "organization": "killswitch-advisory",
+    "otvp_id": "otvp:org:killswitch-advisory",
+    "environment": "production"
+  },
+  "relying_party": null,
+  "query_ref": null,
+  "disclosure_level": "claims_only",
+  "claims": [
+    {
+      "claim_id": "cl-a71c22d71dfe",
+      "domain": "data_protection.encryption.at_rest",
+      "assertion": "All production storage resources are encrypted at rest",
+      "result": "PARTIAL",
+      "confidence": 0.45,
+      "evidence_refs": [
+        "ev-5ab43f14dcd4",
+        "ev-03e620b5e62e",
+        "ev-6317e0f51747",
+        "ev-6f055adf7078",
+        "ev-d8b6e517d17a",
+        "ev-fb90c381c9df"
+      ],
+      "evidence_count": 6,
+      "opinion": {
+        "assessment": "3/6 resources satisfy encryption_enabled.",
+        "context": null,
+        "caveats": [
+          "3 resource(s) non-compliant: arn:aws:rds:us-east-2:294137048789:db:otvp-test-unencrypted, arn:aws:s3:::otvp-test-unecrypted, arn:aws:ec2:us-east-2:294137048789:volume/vol-09084a370bdefdc37"
+        ],
+        "recommendations": []
+      },
+      "scope": {
+        "environment": "test",
+        "services": [
+          "RDS",
+          "S3",
+          "EBS"
+        ],
+        "regions": [
+          "us-east-2"
+        ],
+        "accounts": [],
+        "exclusions": []
+      },
+      "valid_from": "2026-02-14T21:05:01.765920+00:00",
+      "ttl_seconds": 3600,
+      "agent_id": "aws-encryption-agent-v1",
+      "agent_version": "1.0.0",
+      "agent_certification": null,
+      "signature": "tHdkkC2ElT6wqZ8gtNSYDgnxqf5v12OOBwX1idO9b9geCoecK5YzfIAXXmLYXpLiPldGGYkaZ50J/0vZWeDjBQ=="
+    }
+  ],
+  "evidence_summary": {
+    "total_items": 6,
+    "merkle_root": "a6489829ec90a4bfcc445f4c20f777ae7ba0afda224081d7e7ea2c07bb5c44ae",
+    "collection_window_start": "2026-02-14T21:04:59.775177+00:00",
+    "collection_window_end": "2026-02-14T21:05:01.758604+00:00",
+    "domains_covered": [
+      "data_protection.encryption.at_rest"
+    ]
+  },
+  "composite_level": "CRITICAL",
+  "domain_scores": {
+    "data_protection.encryption": {
+      "level": "CRITICAL",
+      "confidence": 0.45,
+      "claims_satisfied": 0,
+      "claims_total": 1
+    }
+  },
+  "signer_id": "aws-encryption-agent-v1",
+  "signature": "Vy9FfXtAHN+gficpo0EMpoRVG66n1qmgdDy+bgyGuy7hyB/8Zy7FIjfxA3vIyN6id74GkcfchC8a/CAXZiJFBQ=="
+}
