@@ -75,22 +75,21 @@ class BooleanEvaluator(Evaluator):
         pct = len(matching) / total
 
         if pct == 1.0:
-            conf = min(0.99, 0.80 + 0.19 * min(total / 20, 1.0))
             return EvaluationResult(
-                result=ClaimResult.SATISFIED, confidence=round(conf, 3),
-                assessment=f"All {total} resources have {self.property_name} = {self.expected_value}.",
+                result=ClaimResult.SATISFIED, confidence=1.0,
+                assessment=f"All {total} resource(s) verified: {self.property_name} = {self.expected_value}. 100% of population scanned.",
                 evidence_ids=[e.evidence_id for e in evidence_items])
         elif pct >= 0.5:
             return EvaluationResult(
-                result=ClaimResult.PARTIAL, confidence=round(pct * 0.9, 3),
-                assessment=f"{len(matching)}/{total} resources satisfy {self.property_name}.",
+                result=ClaimResult.PARTIAL, confidence=round(pct, 3),
+                assessment=f"{len(matching)}/{total} resources satisfy {self.property_name}. {len(non_matching)} non-compliant.",
                 caveats=[f"{len(non_matching)} resource(s) non-compliant: " +
                          ", ".join(e.observation.get("resource", "?") if isinstance(e.observation, dict) else "?"
                                   for e in non_matching)],
                 evidence_ids=[e.evidence_id for e in evidence_items])
         else:
             return EvaluationResult(
-                result=ClaimResult.NOT_SATISFIED, confidence=0.95,
-                assessment=f"Only {len(matching)}/{total} meet {self.property_name} = {self.expected_value}.",
+                result=ClaimResult.NOT_SATISFIED, confidence=1.0,
+                assessment=f"Only {len(matching)}/{total} meet {self.property_name} = {self.expected_value}. {len(non_matching)} non-compliant.",
                 caveats=[f"{len(non_matching)} resource(s) non-compliant"],
                 evidence_ids=[e.evidence_id for e in evidence_items])
