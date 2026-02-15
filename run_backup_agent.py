@@ -191,7 +191,7 @@ class BackupEvaluator:
 
         total = len(resource_checks)
         if total == 0:
-            conf = 0.5 if has_backup_plans else 0.3
+            conf = 1.0
             return EvaluationResult(
                 result=ClaimResult.PARTIAL if has_backup_plans else ClaimResult.NOT_SATISFIED,
                 confidence=conf,
@@ -203,17 +203,17 @@ class BackupEvaluator:
         pct = len(protected) / total if total > 0 else 0
 
         if pct == 1.0:
-            conf = min(0.99, 0.85 + 0.14 * min(total / 10, 1.0))
-            return EvaluationResult(result=ClaimResult.SATISFIED, confidence=round(conf, 3),
+            conf = 1.0
+            return EvaluationResult(result=ClaimResult.SATISFIED, confidence=conf,
                 assessment=f"All {total} data store(s) have backup protection. {len(protected)} resource(s) covered.",
                 caveats=caveats, evidence_ids=[e.evidence_id for e in evidence_items])
         elif pct > 0.5:
-            return EvaluationResult(result=ClaimResult.PARTIAL, confidence=round(pct * 0.85, 3),
+            return EvaluationResult(result=ClaimResult.PARTIAL, confidence=round(pct, 3),
                 assessment=f"{len(protected)}/{total} data stores have backup coverage.",
                 caveats=caveats, recommendations=recommendations,
                 evidence_ids=[e.evidence_id for e in evidence_items])
         else:
-            return EvaluationResult(result=ClaimResult.NOT_SATISFIED, confidence=0.95,
+            return EvaluationResult(result=ClaimResult.NOT_SATISFIED, confidence=1.0,
                 assessment=f"Only {len(protected)}/{total} data stores have backup coverage.",
                 caveats=caveats, recommendations=recommendations,
                 evidence_ids=[e.evidence_id for e in evidence_items])

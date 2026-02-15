@@ -176,7 +176,7 @@ class MFAEnforcementEvaluator:
         if total_console == 0:
             return EvaluationResult(
                 result=ClaimResult.NOT_APPLICABLE,
-                confidence=0.90,
+                confidence=1.0,
                 assessment=f"No IAM users with console access found. {total_programmatic} programmatic-only user(s) present.",
                 evidence_ids=[e.evidence_id for e in evidence_items],
             )
@@ -184,10 +184,10 @@ class MFAEnforcementEvaluator:
         pct = len(console_with_mfa) / total_console
 
         if pct == 1.0:
-            conf = min(0.99, 0.85 + 0.14 * min(total_console / 10, 1.0))
+            conf = 1.0
             return EvaluationResult(
                 result=ClaimResult.SATISFIED,
-                confidence=round(conf, 3),
+                confidence=conf,
                 assessment=f"All {total_console} console user(s) have MFA enabled. {total_programmatic} programmatic-only user(s) not in scope.",
                 evidence_ids=[e.evidence_id for e in evidence_items],
             )
@@ -199,7 +199,7 @@ class MFAEnforcementEvaluator:
                 caveats.append(f"{total_programmatic} programmatic-only user(s) excluded from console MFA scope")
             return EvaluationResult(
                 result=ClaimResult.PARTIAL,
-                confidence=round(pct * 0.85, 3),
+                confidence=round(pct, 3),
                 assessment=f"{len(console_with_mfa)}/{total_console} console user(s) have MFA enabled.",
                 caveats=caveats,
                 recommendations=[
@@ -211,7 +211,7 @@ class MFAEnforcementEvaluator:
         else:
             return EvaluationResult(
                 result=ClaimResult.NOT_SATISFIED,
-                confidence=0.95,
+                confidence=1.0,
                 assessment=f"No console users have MFA enabled (0/{total_console}).",
                 caveats=[f"Users without MFA: {', '.join(console_without_mfa)}"],
                 recommendations=[

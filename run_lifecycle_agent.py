@@ -164,17 +164,17 @@ class AccountLifecycleEvaluator:
             recommendations.append("Deactivate or rotate unused access keys")
 
         if pct == 1.0:
-            conf = min(0.99, 0.85 + 0.14 * min(total / 10, 1.0))
-            return EvaluationResult(result=ClaimResult.SATISFIED, confidence=round(conf, 3),
+            conf = 1.0
+            return EvaluationResult(result=ClaimResult.SATISFIED, confidence=conf,
                 assessment=f"All {total} IAM account(s) are actively used with no stale credentials.",
                 caveats=caveats, evidence_ids=[e.evidence_id for e in evidence_items])
         elif pct > 0.5:
-            return EvaluationResult(result=ClaimResult.PARTIAL, confidence=round(pct * 0.85, 3),
+            return EvaluationResult(result=ClaimResult.PARTIAL, confidence=round(pct, 3),
                 assessment=f"{len(healthy)}/{total} IAM accounts are healthy. {len(unhealthy)} have stale credentials.",
                 caveats=caveats, recommendations=recommendations,
                 evidence_ids=[e.evidence_id for e in evidence_items])
         else:
-            return EvaluationResult(result=ClaimResult.NOT_SATISFIED, confidence=0.95,
+            return EvaluationResult(result=ClaimResult.NOT_SATISFIED, confidence=1.0,
                 assessment=f"Only {len(healthy)}/{total} IAM accounts are healthy.",
                 caveats=caveats, recommendations=recommendations,
                 evidence_ids=[e.evidence_id for e in evidence_items])

@@ -182,21 +182,21 @@ class VulnManagementEvaluator:
                 caveats.append("No vulnerability management tools detected")
                 recommendations.append("Enable SSM Agent on EC2 instances for patch management")
                 recommendations.append("Activate Amazon Inspector for vulnerability scanning")
-                return EvaluationResult(result=ClaimResult.NOT_SATISFIED, confidence=0.90,
+                return EvaluationResult(result=ClaimResult.NOT_SATISFIED, confidence=1.0,
                     assessment="No vulnerability management infrastructure detected.",
                     caveats=caveats, recommendations=recommendations,
                     evidence_ids=[e.evidence_id for e in evidence_items])
 
         if not has_ssm and not has_inspector:
             if not inspector_enabled:
-                return EvaluationResult(result=ClaimResult.PARTIAL, confidence=0.5,
+                return EvaluationResult(result=ClaimResult.PARTIAL, confidence=1.0,
                     assessment="No EC2 instances under SSM management and Inspector not enabled.",
                     caveats=caveats, recommendations=recommendations,
                     evidence_ids=[e.evidence_id for e in evidence_items])
 
         if critical_vulns > 0:
             recommendations.append(f"Remediate {critical_vulns} critical vulnerability(ies) within 30 days")
-            return EvaluationResult(result=ClaimResult.NOT_SATISFIED, confidence=0.95,
+            return EvaluationResult(result=ClaimResult.NOT_SATISFIED, confidence=1.0,
                 assessment=f"Critical vulnerabilities found: {critical_vulns} critical finding(s) require immediate attention.",
                 caveats=caveats, recommendations=recommendations,
                 evidence_ids=[e.evidence_id for e in evidence_items])
@@ -208,7 +208,7 @@ class VulnManagementEvaluator:
                 caveats=caveats, recommendations=recommendations,
                 evidence_ids=[e.evidence_id for e in evidence_items])
 
-        return EvaluationResult(result=ClaimResult.PARTIAL, confidence=0.6,
+        return EvaluationResult(result=ClaimResult.PARTIAL, confidence=1.0,
             assessment=f"Vulnerability management partially configured. {non_compliant_patches} non-compliant patches found.",
             caveats=caveats, recommendations=recommendations,
             evidence_ids=[e.evidence_id for e in evidence_items])

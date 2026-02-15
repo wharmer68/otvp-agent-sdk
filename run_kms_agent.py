@@ -205,7 +205,7 @@ class KMSKeyManagementEvaluator:
                 )
             return EvaluationResult(
                 result=ClaimResult.SATISFIED,
-                confidence=0.85,
+                confidence=1.0,
                 assessment=assessment,
                 caveats=caveats,
                 recommendations=recommendations,
@@ -215,10 +215,10 @@ class KMSKeyManagementEvaluator:
         pct = len(cmk_with_rotation) / total_cmk if total_cmk > 0 else 0
 
         if pct == 1.0:
-            conf = min(0.99, 0.85 + 0.14 * min(total_cmk / 10, 1.0))
+            conf = 1.0
             return EvaluationResult(
                 result=ClaimResult.SATISFIED,
-                confidence=round(conf, 3),
+                confidence=conf,
                 assessment=f"All {total_cmk} customer-managed key(s) have rotation enabled. {total_aws} AWS-managed key(s) auto-rotate.",
                 caveats=caveats,
                 evidence_ids=[e.evidence_id for e in evidence_items],
@@ -229,7 +229,7 @@ class KMSKeyManagementEvaluator:
             recommendations.append("Use: aws kms enable-key-rotation --key-id <key-id>")
             return EvaluationResult(
                 result=ClaimResult.PARTIAL,
-                confidence=round(pct * 0.85, 3),
+                confidence=round(pct, 3),
                 assessment=f"{len(cmk_with_rotation)}/{total_cmk} customer-managed key(s) have rotation enabled.",
                 caveats=caveats,
                 recommendations=recommendations,
@@ -241,7 +241,7 @@ class KMSKeyManagementEvaluator:
             recommendations.append("Use: aws kms enable-key-rotation --key-id <key-id>")
             return EvaluationResult(
                 result=ClaimResult.NOT_SATISFIED,
-                confidence=0.95,
+                confidence=1.0,
                 assessment=f"No customer-managed keys have rotation enabled (0/{total_cmk}).",
                 caveats=caveats,
                 recommendations=recommendations,

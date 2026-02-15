@@ -235,10 +235,10 @@ class AuditLoggingEvaluator:
         caveats = issues[:5]  # Cap display
 
         if pct == 1.0:
-            conf = min(0.99, 0.85 + 0.14 * min(total_checks / 10, 1.0))
+            conf = 1.0
             return EvaluationResult(
                 result=ClaimResult.SATISFIED,
-                confidence=round(conf, 3),
+                confidence=conf,
                 assessment=f"All logging checks passed. {trail_compliant} compliant trail(s), {vpc_covered}/{len(vpc_items)} VPC(s) with flow logs.",
                 caveats=caveats,
                 recommendations=recommendations,
@@ -247,7 +247,7 @@ class AuditLoggingEvaluator:
         elif pct > 0.5:
             return EvaluationResult(
                 result=ClaimResult.PARTIAL,
-                confidence=round(pct * 0.85, 3),
+                confidence=round(pct, 3),
                 assessment=f"{passing}/{total_checks} logging checks passed. {trail_compliant} compliant trail(s), {vpc_covered}/{len(vpc_items)} VPC(s) with flow logs.",
                 caveats=caveats,
                 recommendations=recommendations,
@@ -256,7 +256,7 @@ class AuditLoggingEvaluator:
         else:
             return EvaluationResult(
                 result=ClaimResult.NOT_SATISFIED,
-                confidence=0.95,
+                confidence=1.0,
                 assessment=f"Only {passing}/{total_checks} logging checks passed. Significant gaps in audit logging coverage.",
                 caveats=caveats,
                 recommendations=recommendations,

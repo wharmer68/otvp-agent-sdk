@@ -168,17 +168,17 @@ class LeastPrivilegeEvaluator:
         pct = len(compliant) / total if total > 0 else 0
 
         if pct == 1.0:
-            conf = min(0.99, 0.85 + 0.14 * min(total / 20, 1.0))
-            return EvaluationResult(result=ClaimResult.SATISFIED, confidence=round(conf, 3),
+            conf = 1.0
+            return EvaluationResult(result=ClaimResult.SATISFIED, confidence=conf,
                 assessment=f"All {total} IAM principal(s) follow least privilege. No admin policies directly attached.",
                 caveats=caveats, evidence_ids=[e.evidence_id for e in evidence_items])
         elif pct > 0.7:
-            return EvaluationResult(result=ClaimResult.PARTIAL, confidence=round(pct * 0.85, 3),
+            return EvaluationResult(result=ClaimResult.PARTIAL, confidence=round(pct, 3),
                 assessment=f"{len(compliant)}/{total} IAM principals follow least privilege. {len(non_compliant)} overprivileged.",
                 caveats=caveats, recommendations=recommendations,
                 evidence_ids=[e.evidence_id for e in evidence_items])
         else:
-            return EvaluationResult(result=ClaimResult.NOT_SATISFIED, confidence=0.95,
+            return EvaluationResult(result=ClaimResult.NOT_SATISFIED, confidence=1.0,
                 assessment=f"Only {len(compliant)}/{total} IAM principals follow least privilege.",
                 caveats=caveats, recommendations=recommendations,
                 evidence_ids=[e.evidence_id for e in evidence_items])

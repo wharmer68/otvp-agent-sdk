@@ -183,10 +183,10 @@ class NetworkSegmentationEvaluator:
             recommendations.append("Use AWS Systems Manager Session Manager instead of direct SSH access")
 
         if pct == 1.0:
-            conf = min(0.99, 0.85 + 0.14 * min(total_sgs / 20, 1.0))
+            conf = 1.0
             return EvaluationResult(
                 result=ClaimResult.SATISFIED,
-                confidence=round(conf, 3),
+                confidence=conf,
                 assessment=f"All {total_sgs} security group(s) properly segmented. No high-risk ports exposed to internet.",
                 caveats=caveats,
                 evidence_ids=[e.evidence_id for e in evidence_items],
@@ -194,7 +194,7 @@ class NetworkSegmentationEvaluator:
         elif pct > 0.5:
             return EvaluationResult(
                 result=ClaimResult.PARTIAL,
-                confidence=round(pct * 0.8, 3),
+                confidence=round(pct, 3),
                 assessment=f"{len(compliant_sgs)}/{total_sgs} security group(s) properly segmented.",
                 caveats=caveats,
                 recommendations=recommendations,
@@ -203,7 +203,7 @@ class NetworkSegmentationEvaluator:
         else:
             return EvaluationResult(
                 result=ClaimResult.NOT_SATISFIED,
-                confidence=0.95,
+                confidence=1.0,
                 assessment=f"Only {len(compliant_sgs)}/{total_sgs} security group(s) properly segmented. {len(all_high_risk)} high-risk exposure(s) found.",
                 caveats=caveats,
                 recommendations=recommendations,

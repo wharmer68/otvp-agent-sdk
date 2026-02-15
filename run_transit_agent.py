@@ -176,7 +176,7 @@ class TransitEncryptionEvaluator:
 
     async def evaluate(self, evidence_items: list[Evidence]) -> EvaluationResult:
         if not evidence_items:
-            return EvaluationResult(result=ClaimResult.NOT_APPLICABLE, confidence=0.85,
+            return EvaluationResult(result=ClaimResult.NOT_APPLICABLE, confidence=1.0,
                 assessment="No load balancers or certificates found. Transit encryption evaluation not applicable.",
                 evidence_ids=[])
 
@@ -212,7 +212,7 @@ class TransitEncryptionEvaluator:
 
         total = len([e for e in evidence_items if (e.observation or {}).get("property") == "TLSCompliant"])
         if total == 0:
-            return EvaluationResult(result=ClaimResult.NOT_APPLICABLE, confidence=0.85,
+            return EvaluationResult(result=ClaimResult.NOT_APPLICABLE, confidence=1.0,
                 assessment="No load balancers found. Transit encryption at the load balancer layer not applicable.",
                 caveats=caveats, recommendations=recommendations,
                 evidence_ids=[e.evidence_id for e in evidence_items])
@@ -220,16 +220,16 @@ class TransitEncryptionEvaluator:
         pct = len(compliant) / total if total > 0 else 0
 
         if pct == 1.0 and not caveats:
-            return EvaluationResult(result=ClaimResult.SATISFIED, confidence=round(min(0.99, 0.85 + 0.14 * min(total/5, 1.0)), 3),
+            return EvaluationResult(result=ClaimResult.SATISFIED, confidence=1.0,
                 assessment=f"All {total} load balancer(s) enforce TLS 1.2+. All certificates valid.",
                 caveats=caveats, evidence_ids=[e.evidence_id for e in evidence_items])
         elif pct >= 0.5:
-            return EvaluationResult(result=ClaimResult.PARTIAL, confidence=round(pct * 0.85, 3),
+            return EvaluationResult(result=ClaimResult.PARTIAL, confidence=round(pct, 3),
                 assessment=f"{len(compliant)}/{total} load balancer(s) have compliant TLS configuration.",
                 caveats=caveats, recommendations=recommendations,
                 evidence_ids=[e.evidence_id for e in evidence_items])
         else:
-            return EvaluationResult(result=ClaimResult.NOT_SATISFIED, confidence=0.95,
+            return EvaluationResult(result=ClaimResult.NOT_SATISFIED, confidence=1.0,
                 assessment=f"Only {len(compliant)}/{total} load balancer(s) have compliant TLS.",
                 caveats=caveats, recommendations=recommendations,
                 evidence_ids=[e.evidence_id for e in evidence_items])
