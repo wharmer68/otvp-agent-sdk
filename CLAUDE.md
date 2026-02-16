@@ -6,54 +6,93 @@ The core engine of the Open Transparency Verification Platform. Contains autonom
 
 This is where the actual security verification logic lives. The otvp-app consumes this SDK to run agents and display results.
 
+## Repository Structure
+
+```
+otvp-sdk/
+├── otvp_agent/                # Core agent package (shared logic, models, utilities)
+├── run_agent.py               # Encryption at Rest agent (the original/first agent)
+├── run_backup_agent.py        # Backup & Recovery agent
+├── run_ingress_agent.py       # Ingress Controls agent
+├── run_kms_agent.py           # KMS Key Management agent
+├── run_lifecycle_agent.py     # Account Lifecycle agent
+├── run_logging_agent.py       # Audit Logging agent
+├── run_mfa_agent.py           # IAM MFA Enforcement agent
+├── run_network_agent.py       # Network Segmentation agent
+├── run_privilege_agent.py     # Least Privilege agent
+├── run_transit_agent.py       # Encryption in Transit agent
+├── run_vuln_agent.py          # Vulnerability Management agent
+├── trust_envelope_*.json      # Output envelopes (posture snapshots)
+├── requirements.txt           # Python dependencies
+├── README.md
+├── otvp-env/                  # Python virtual environment (do not commit)
+└── CLAUDE.md
+```
+
+### Naming Convention
+- **Agent runners:** `run_<control>_agent.py` — one per control criterion
+- **Envelope outputs:** `trust_envelope_<control>_killswitch-advisory.json` — one per agent run
+- **Core package:** `otvp_agent/` — shared logic imported by all runners
+
 ## The 11 Control Agents
 
-| # | Agent | What It Checks | SOC 2 Mapping |
-|---|-------|----------------|---------------|
-| 1 | Encryption at Rest | RDS, S3, EBS encryption status | CC6.1, CC6.7 |
-| 2 | IAM MFA Enforcement | Console users with/without MFA | CC6.1 |
-| 3 | KMS Key Management | Key rotation, CMK vs AWS-managed keys | CC6.1, CC6.7 |
-| 4 | Network Segmentation | Security groups, high-risk ports exposed | CC6.1, CC6.6 |
-| 5 | Audit Logging | CloudTrail config, VPC flow logs | CC7.1, CC7.2 |
-| 6 | Account Lifecycle | Stale accounts, unused access keys | CC6.2, CC6.5 |
-| 7 | Encryption in Transit | ALB TLS config, certificate validity | CC6.1, CC6.7 |
-| 8 | Ingress Controls | Public attack surface, WAF coverage | CC6.6 |
-| 9 | Least Privilege | Admin policy sprawl, inline policies | CC6.3 |
-| 10 | Vulnerability Management | SSM patch compliance, Inspector findings | CC7.1 |
-| 11 | Backup & Recovery | AWS Backup plans, snapshot coverage | CC7.5, CC9.1 |
+| # | Control | Runner File | SOC 2 Mapping |
+|---|---------|-------------|---------------|
+| 1 | Encryption at Rest | `run_agent.py` | CC6.1, CC6.7 |
+| 2 | IAM MFA Enforcement | `run_mfa_agent.py` | CC6.1 |
+| 3 | KMS Key Management | `run_kms_agent.py` | CC6.1, CC6.7 |
+| 4 | Network Segmentation | `run_network_agent.py` | CC6.1, CC6.6 |
+| 5 | Audit Logging | `run_logging_agent.py` | CC7.1, CC7.2 |
+| 6 | Account Lifecycle | `run_lifecycle_agent.py` | CC6.2, CC6.5 |
+| 7 | Encryption in Transit | `run_transit_agent.py` | CC6.1, CC6.7 |
+| 8 | Ingress Controls | `run_ingress_agent.py` | CC6.6 |
+| 9 | Least Privilege | `run_privilege_agent.py` | CC6.3 |
+| 10 | Vulnerability Management | `run_vuln_agent.py` | CC7.1 |
+| 11 | Backup & Recovery | `run_backup_agent.py` | CC7.5, CC9.1 |
 
 ## Key Concepts
 
-### Envelopes
-An **envelope** is a point-in-time posture snapshot for a specific control. Each agent run produces an envelope containing:
+### Trust Envelopes
+A **trust envelope** is a point-in-time posture snapshot for a specific control. Each agent run produces a JSON envelope file (`trust_envelope_<control>_killswitch-advisory.json`) containing:
 - Control identifier and SOC 2 mapping
 - Pass/fail/warning status per resource
 - Evidence collected (what was checked, what was found)
 - Timestamp and scope
+- Organization identifier (killswitch-advisory)
 
 Envelopes are the primary data structure consumed by otvp-app for display.
 
 ### Agents
-Each control has a dedicated agent that:
-1. Authenticates to AWS (read-only IAM permissions)
-2. Queries relevant services (EC2, S3, IAM, CloudTrail, etc.)
-3. Evaluates findings against defined criteria
-4. Produces an envelope with results
+Each `run_*_agent.py` script:
+1. Imports shared logic from `otvp_agent/`
+2. Authenticates to AWS (read-only IAM permissions)
+3. Queries relevant AWS services
+4. Evaluates findings against defined criteria
+5. Writes a trust envelope JSON file
 
 **Critical:** Agents are **read-only**. They observe and report. They never modify infrastructure.
 
-## Architecture
+## Development Setup
 
-```
-otvp-sdk/
-├── agents/           # One agent per control criterion
-├── tests/            # Test suite for each agent
-├── models/           # Envelope and finding data structures
-├── utils/            # AWS client helpers, shared logic
-└── config/           # Control criteria definitions, thresholds
+```bash
+cd ~/otvp-projects/otvp-sdk
+source otvp-env/bin/activate
+pip install -r requirements.txt
 ```
 
-<!-- UPDATE: Verify this matches actual directory structure -->
+## Running Agents
+
+```bash
+# Activate the virtual environment first
+source otvp-env/bin/activate
+
+# Run a specific agent
+python run_mfa_agent.py
+python run_network_agent.py
+# etc.
+```
+
+Each agent writes its envelope to the repo root as `trust_envelope_<control>_killswitch-advisory.json`.
 
 ## Development Rules
 
@@ -62,8 +101,8 @@ otvp-sdk/
 - **No credentials in code** — AWS auth via environment variables, profiles, or IAM roles
 - **Deterministic output** — same infrastructure state should produce the same envelope
 - **Error handling** — if an agent can't access a resource, it reports "unable to assess" not "pass"
-- **Test coverage** — each agent needs tests with mocked AWS responses
-- `.gitignore` must include: `.env`, `*.log`, `__pycache__/`, `results/`
+- **Do not commit:** `otvp-env/`, `.env`, `*.log`, `__pycache__/`
+- **Envelope files ARE committed** — they're the output artifacts and should be versioned
 
 ## AWS Permissions Model
 
@@ -87,10 +126,10 @@ Agents need read-only access to these AWS services:
 ## Relationship to Other Repos
 
 - **otvp-app** imports/calls this SDK to run agents and display envelopes
-- **otvp** (parent) is the older standalone RLS scanner — narrower scope, Supabase-specific
+- **otvp** is the older standalone RLS scanner — narrower scope, Supabase-specific
 - **otvp-dashboard** is deprecated static UI — otvp-app replaces it
 - See `~/otvp-projects/CLAUDE.md` for full system overview
 
 ## Owner Context
 
-Bil Harmer — CISO at Supabase. The SOC 2 mappings are intentional — this tool is designed to provide continuous verification evidence, not just one-time audit snapshots. Think of it as "compliance as code" for AWS security baselines.
+Bil Harmer — CISO at Supabase. Returning to coding after 20+ years. Be explicit about commands, file paths, and Python conventions. The SOC 2 mappings are intentional — this tool provides continuous verification evidence, not just one-time audit snapshots. Think of it as "compliance as code" for AWS security baselines.
