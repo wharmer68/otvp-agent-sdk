@@ -1,8 +1,8 @@
 {
-  "envelope_id": "te-9b304da26c67",
+  "envelope_id": "te-444c049656dd",
   "schema_version": "1.0",
-  "generated_at": "2026-02-15T23:36:31.716252+00:00",
-  "valid_until": "2026-02-16T00:36:31.716252+00:00",
+  "generated_at": "2026-02-15T23:56:57.997074+00:00",
+  "valid_until": "2026-02-16T00:56:57.997074+00:00",
   "ttl_seconds": 3600,
   "subject": {
     "organization": "killswitch-advisory",
@@ -14,17 +14,26 @@
   "disclosure_level": "claims_only",
   "claims": [
     {
-      "claim_id": "cl-790a1a8beefc",
+      "claim_id": "cl-921898e60efb",
       "domain": "data_protection.encryption.at_rest",
       "assertion": "All production storage resources are encrypted at rest",
-      "result": "INDETERMINATE",
-      "confidence": 0.0,
-      "evidence_refs": [],
-      "evidence_count": 0,
+      "result": "PARTIAL",
+      "confidence": 0.5,
+      "evidence_refs": [
+        "ev-80480fb12958",
+        "ev-9b5df2bc7a80",
+        "ev-dc70a15755e6",
+        "ev-693c437fbf72",
+        "ev-103c30af4710",
+        "ev-965b353752f6"
+      ],
+      "evidence_count": 6,
       "opinion": {
-        "assessment": "No evidence collected for data_protection.encryption.at_rest",
+        "assessment": "3/6 resources satisfy encryption_enabled. 3 non-compliant.",
         "context": null,
-        "caveats": [],
+        "caveats": [
+          "3 resource(s) non-compliant: arn:aws:rds:us-east-2:294137048789:db:otvp-prod-analytics, arn:aws:s3:::otvp-prod-logs, arn:aws:ec2:us-east-2:294137048789:volume/vol-022d3b7b946de5cde"
+        ],
         "recommendations": []
       },
       "scope": {
@@ -40,30 +49,32 @@
         "accounts": [],
         "exclusions": []
       },
-      "valid_from": "2026-02-15T23:36:31.713471+00:00",
+      "valid_from": "2026-02-15T23:56:57.996925+00:00",
       "ttl_seconds": 3600,
       "agent_id": "aws-encryption-agent-v1",
       "agent_version": "1.0.0",
       "agent_certification": null,
-      "signature": "6b8BsDIZqjUXiNOxRckEbtiuL3M8nfJgRGzXW5xfeKnQPfdF+0qfC0hKJ/QuStTnnFvlWCjYf2ns5WsVgLE8CQ=="
+      "signature": "7xcHGTmZ6wr1AKAfvc16S8vHEi6Api0ZOICWKwileG797J5WCRI3F+FhQ94LngUsuXz7snznkPZlHKfayP9RAA=="
     }
   ],
   "evidence_summary": {
-    "total_items": 0,
-    "merkle_root": null,
-    "collection_window_start": null,
-    "collection_window_end": null,
-    "domains_covered": []
+    "total_items": 6,
+    "merkle_root": "ccecedcf803e2a58be0442021e296b5fff65470f4e6d4af208d1c276e1df9105",
+    "collection_window_start": "2026-02-15T23:56:55.936726+00:00",
+    "collection_window_end": "2026-02-15T23:56:57.991599+00:00",
+    "domains_covered": [
+      "data_protection.encryption.at_rest"
+    ]
   },
   "composite_level": "CRITICAL",
   "domain_scores": {
     "data_protection.encryption": {
       "level": "CRITICAL",
-      "confidence": 0.0,
+      "confidence": 0.5,
       "claims_satisfied": 0,
       "claims_total": 1
     }
   },
   "signer_id": "aws-encryption-agent-v1",
-  "signature": "lIf9kbKVgfV5bTUFWuTMMrIMoiV5MyEL1QFeRCHcm36wBUpv20zwLR7Pe064xKQb6dwm4PwwmeNzRnkcIuTaCA=="
+  "signature": "j50/7Tm7Lh/wlxVDby6d9YdL7wpzhYzbZcloMgSk/BIkV/V4cSLeBG1h9Hg3S6vhuz/SIu8akDiLX2ccugkfAw=="
 }
