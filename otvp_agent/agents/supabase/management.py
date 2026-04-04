@@ -59,6 +59,7 @@ class SupabaseManagementAPI:
             headers={
                 "Authorization": f"Bearer {self.access_token}",
                 "Content-Type": "application/json",
+                "User-Agent": "otvp-agent-sdk/1.0.0",
             },
         )
         try:
