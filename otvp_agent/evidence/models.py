@@ -15,6 +15,7 @@ class EvidenceType(str, Enum):
     BEHAVIORAL = "BEHAVIORAL"
     ATTESTATION = "ATTESTATION"
     DERIVED = "DERIVED"
+    CONFIGURATION = "CONFIGURATION"
 
 
 @dataclass
