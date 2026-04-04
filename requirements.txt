@@ -1,2 +1,5 @@
 cryptography>=41.0.0
 boto3>=1.28.0
+
+# Optional: Supabase agents (postgres connectivity)
+psycopg2-binary>=2.9.0

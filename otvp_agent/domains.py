@@ -14,6 +14,7 @@ class Domain(str, Enum):
     INCIDENT_RESPONSE = "detection_and_response.incident_response.plan_existence"
     BACKUP_TESTING = "operational_resilience.backup.testing"
     DISASTER_RECOVERY = "operational_resilience.disaster_recovery.plan_existence"
+    ROW_LEVEL_SECURITY = "data_protection.access_control.row_level_security"
 
     @property
     def category(self) -> str:
@@ -33,6 +34,10 @@ FRAMEWORK_MAPPINGS: dict[str, dict[str, list[str]]] = {
     "data_protection.encryption.in_transit": {
         "SOC2_CC": ["CC6.1", "CC6.7"], "ISO27001": ["A.13.1.1"],
         "NIST_CSF": ["PR.DS-2"], "PCI_DSS": ["4.1"], "HIPAA": ["§164.312(e)(1)"],
+    },
+    "data_protection.access_control.row_level_security": {
+        "SOC2_CC": ["CC6.1", "CC6.3"], "ISO27001": ["A.9.4.1"],
+        "NIST_CSF": ["PR.AC-4"], "HIPAA": ["§164.312(a)(1)"],
     },
 }
 
