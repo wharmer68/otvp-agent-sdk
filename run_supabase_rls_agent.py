@@ -225,7 +225,8 @@ class RLSEvaluator(SupabaseEvaluator):
             )
 
         compliant_tables: list[str] = []
-        non_compliant_tables: list[dict] = []
+        partial_tables: list[dict] = []   # Overly permissive but RLS is on
+        non_compliant_tables: list[dict] = []  # RLS off or no policies
         risk_findings: list[dict] = []
 
         for item in evidence_items:
@@ -267,7 +268,8 @@ class RLSEvaluator(SupabaseEvaluator):
                 })
             elif "using_true_on_anon" in risk_flags:
                 # Overly permissive — USING(true) on anon role
-                non_compliant_tables.append({
+                # RLS is on and policies exist, but they're too open
+                partial_tables.append({
                     "table": resource_id,
                     "reason": "Overly permissive: USING(true) on anon role",
                 })
@@ -287,6 +289,7 @@ class RLSEvaluator(SupabaseEvaluator):
 
         total = len(evidence_items)
         pass_count = len(compliant_tables)
+        partial_count = len(partial_tables)
         fail_count = len(non_compliant_tables)
 
         details = {
@@ -308,6 +311,7 @@ class RLSEvaluator(SupabaseEvaluator):
                 if isinstance(e.observation, dict) and e.observation.get("policy_count", 0) == 0
             ),
             "compliant_tables": compliant_tables,
+            "partial_tables": partial_tables,
             "non_compliant_tables": non_compliant_tables,
             "risk_findings": risk_findings,
         }
@@ -326,10 +330,11 @@ class RLSEvaluator(SupabaseEvaluator):
                 evidence_ids=all_evidence_ids,
             )
 
-        if pass_count == 0:
-            # Build recommendations from risk findings
+        # Any non-compliant tables (RLS off or no policies) = NOT_SATISFIED
+        # unless some tables are compliant, then PARTIAL
+        if fail_count > 0 and pass_count == 0 and partial_count == 0:
             recommendations = []
-            for finding in risk_findings[:5]:  # Cap at 5 to avoid noise
+            for finding in risk_findings[:5]:
                 recommendations.append(finding["recommendation"])
 
             return EvaluationResult(
@@ -346,22 +351,27 @@ class RLSEvaluator(SupabaseEvaluator):
                 evidence_ids=all_evidence_ids,
             )
 
-        # Partial compliance
+        # Partial compliance — mix of compliant, partial, and/or non-compliant
+        # Confidence = fully compliant / total (direct ratio)
         confidence = round(pass_count / total, 3)
         caveats = []
         for entry in non_compliant_tables[:10]:
+            caveats.append(f"{entry['table']}: {entry['reason']}")
+        for entry in partial_tables[:10]:
             caveats.append(f"{entry['table']}: {entry['reason']}")
 
         recommendations = []
         for finding in risk_findings[:5]:
             recommendations.append(finding["recommendation"])
 
+        issue_count = fail_count + partial_count
         return EvaluationResult(
             result=ClaimResult.PARTIAL,
             confidence=confidence,
             assessment=(
-                f"{pass_count}/{total} table(s) pass RLS verification. "
-                f"{fail_count} table(s) have issues."
+                f"{pass_count}/{total} table(s) fully pass RLS verification. "
+                f"{issue_count} table(s) have issues "
+                f"({fail_count} non-compliant, {partial_count} overly permissive)."
             ),
             caveats=caveats,
             recommendations=recommendations,
