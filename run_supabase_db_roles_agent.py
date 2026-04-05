@@ -39,6 +39,7 @@ PLATFORM_ROLES = [
     "supabase_realtime_admin", "supabase_functions_admin",
     "dashboard_user", "pgbouncer", "pgsodium_keyholder",
     "pgsodium_keymaker", "pgsodium_keyiduser",
+    "supabase_etl_admin", "supabase_read_only_user",
 ]
 
 SQL_ALL_ROLES = """
