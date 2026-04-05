@@ -78,7 +78,7 @@ class DBRoleCollector(SupabaseCollector):
         dangerous_roles = []
         for role in roles:
             name = role["rolname"]
-            if name in PLATFORM_ROLES:
+            if name in PLATFORM_ROLES or name in SUPABASE_API_ROLES:
                 continue
 
             flags = []
