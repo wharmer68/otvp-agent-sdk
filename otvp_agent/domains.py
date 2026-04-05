@@ -18,6 +18,15 @@ class Domain(str, Enum):
     RLS_POLICY_QUALITY = "data_protection.access_control.policy_quality"
     AUTH_CONFIGURATION = "identity_and_access.authentication.configuration"
     MFA_ENROLLMENT = "identity_and_access.authentication.multi_factor"
+    API_KEY_HYGIENE = "identity_and_access.credentials.api_keys"
+    DATA_API_HARDENING = "network_security.api_surface.data_api"
+    POSTGREST_EXPOSURE = "network_security.api_surface.postgrest"
+    STORAGE_BUCKETS = "data_protection.storage.bucket_access"
+    EDGE_FUNCTIONS = "application_security.serverless.edge_functions"
+    NETWORK_RESTRICTIONS = "network_security.access_controls.network_restrictions"
+    DB_ROLE_PRIVILEGES = "identity_and_access.authorization.database_roles"
+    AUDIT_LOGGING = "detection_and_response.logging.audit_logging"
+    REALTIME_CHANNELS = "data_protection.realtime.channel_access"
 
     @property
     def category(self) -> str:
@@ -53,6 +62,42 @@ FRAMEWORK_MAPPINGS: dict[str, dict[str, list[str]]] = {
     "identity_and_access.authentication.multi_factor": {
         "SOC2_CC": ["CC6.1", "CC6.2"], "ISO27001": ["A.9.4.2"],
         "NIST_CSF": ["PR.AC-7"], "HIPAA": ["§164.312(d)"],
+    },
+    "identity_and_access.credentials.api_keys": {
+        "SOC2_CC": ["CC6.1", "CC6.6"], "ISO27001": ["A.9.2.4"],
+        "NIST_CSF": ["PR.AC-1"], "HIPAA": ["§164.312(d)"],
+    },
+    "network_security.api_surface.data_api": {
+        "SOC2_CC": ["CC6.1", "CC6.6", "CC6.7"], "ISO27001": ["A.13.1.1"],
+        "NIST_CSF": ["PR.AC-5"], "HIPAA": ["§164.312(e)(1)"],
+    },
+    "network_security.api_surface.postgrest": {
+        "SOC2_CC": ["CC6.1", "CC6.6"], "ISO27001": ["A.13.1.1"],
+        "NIST_CSF": ["PR.AC-5"],
+    },
+    "data_protection.storage.bucket_access": {
+        "SOC2_CC": ["CC6.1", "CC6.7"], "ISO27001": ["A.8.2.3"],
+        "NIST_CSF": ["PR.DS-1"], "HIPAA": ["§164.312(a)(1)"],
+    },
+    "application_security.serverless.edge_functions": {
+        "SOC2_CC": ["CC6.1", "CC6.6"], "ISO27001": ["A.14.2.1"],
+        "NIST_CSF": ["PR.AC-4"],
+    },
+    "network_security.access_controls.network_restrictions": {
+        "SOC2_CC": ["CC6.6", "CC6.7"], "ISO27001": ["A.13.1.1", "A.13.1.3"],
+        "NIST_CSF": ["PR.AC-5"], "HIPAA": ["§164.312(e)(1)"],
+    },
+    "identity_and_access.authorization.database_roles": {
+        "SOC2_CC": ["CC6.1", "CC6.3"], "ISO27001": ["A.9.2.3"],
+        "NIST_CSF": ["PR.AC-4"], "HIPAA": ["§164.312(a)(1)"],
+    },
+    "detection_and_response.logging.audit_logging": {
+        "SOC2_CC": ["CC7.1", "CC7.2", "CC7.3"], "ISO27001": ["A.12.4.1"],
+        "NIST_CSF": ["DE.AE-3"], "HIPAA": ["§164.312(b)"],
+    },
+    "data_protection.realtime.channel_access": {
+        "SOC2_CC": ["CC6.1", "CC6.7"], "ISO27001": ["A.13.1.1"],
+        "NIST_CSF": ["PR.DS-2"],
     },
 }
 
