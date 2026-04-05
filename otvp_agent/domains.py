@@ -18,6 +18,7 @@ class Domain(str, Enum):
     RLS_POLICY_QUALITY = "data_protection.access_control.policy_quality"
     AUTH_CONFIGURATION = "identity_and_access.authentication.configuration"
     MFA_ENROLLMENT = "identity_and_access.authentication.multi_factor"
+    API_KEY_HYGIENE = "identity_and_access.credentials.api_keys"
 
     @property
     def category(self) -> str:
@@ -53,6 +54,10 @@ FRAMEWORK_MAPPINGS: dict[str, dict[str, list[str]]] = {
     "identity_and_access.authentication.multi_factor": {
         "SOC2_CC": ["CC6.1", "CC6.2"], "ISO27001": ["A.9.4.2"],
         "NIST_CSF": ["PR.AC-7"], "HIPAA": ["§164.312(d)"],
+    },
+    "identity_and_access.credentials.api_keys": {
+        "SOC2_CC": ["CC6.1", "CC6.6"], "ISO27001": ["A.9.2.4"],
+        "NIST_CSF": ["PR.AC-1"], "HIPAA": ["§164.312(d)"],
     },
 }
 

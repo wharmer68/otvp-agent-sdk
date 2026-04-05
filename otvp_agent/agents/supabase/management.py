@@ -40,7 +40,7 @@ class SupabaseManagementAPI:
         self.project_ref = project_ref or os.environ.get("SUPABASE_PROJECT_REF", "")
         self.api_url = (api_url or os.environ.get("SUPABASE_API_URL", DEFAULT_API_URL)).rstrip("/")
 
-    def _request(self, path: str) -> dict[str, Any]:
+    def _request(self, path: str) -> dict[str, Any] | list[Any]:
         """Make an authenticated GET request to the Management API."""
         if not self.access_token:
             raise ManagementAPIError(
@@ -92,4 +92,13 @@ class SupabaseManagementAPI:
 
         Endpoint: GET /v1/projects/{ref}
         """
-        return self._request(f"/v1/projects/{self.project_ref}")
+        result = self._request(f"/v1/projects/{self.project_ref}")
+        return result if isinstance(result, dict) else {}
+
+    def get_api_keys(self) -> list[dict[str, Any]]:
+        """Fetch API keys for the project.
+
+        Endpoint: GET /v1/projects/{ref}/api-keys
+        """
+        result = self._request(f"/v1/projects/{self.project_ref}/api-keys")
+        return result if isinstance(result, list) else []
