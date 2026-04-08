@@ -1,6 +1,6 @@
 """Ed25519 key management for OTVP agents."""
 from __future__ import annotations
-import base64, json
+import base64, hashlib, json
 from dataclasses import dataclass
 from pathlib import Path
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
@@ -76,6 +76,22 @@ class KeyPair:
 
     def export_public_pem(self) -> bytes:
         return self.public_key.public_bytes(Encoding.PEM, PublicFormat.SubjectPublicKeyInfo)
+
+    def public_key_fingerprint(self) -> str:
+        """SHA-256 hex digest of the raw Ed25519 public key bytes."""
+        raw = self.public_key.public_bytes(Encoding.Raw, PublicFormat.Raw)
+        return hashlib.sha256(raw).hexdigest()
+
+    def dns_txt_record(self, kid: str, org_id: str | None = None) -> str:
+        """Generate the DNS TXT record value for OTVP domain verification.
+
+        Returns the value for a TXT record at _otvp.{domain}:
+          v=otvp1; fp={sha256-hex}; kid={key_id}; org={otvp_id}
+        """
+        record = f"v=otvp1; fp={self.public_key_fingerprint()}; kid={kid}"
+        if org_id:
+            record += f"; org={org_id}"
+        return record
 
     def save(self, private_path: str | Path, public_path: str | Path) -> None:
         Path(private_path).write_bytes(self.export_private_pem())
